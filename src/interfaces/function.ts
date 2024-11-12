@@ -18,4 +18,4 @@ interface Function {
   return_parameters?: { [key: string]: any };
 }
 
-export { Function };
+export type { Function };

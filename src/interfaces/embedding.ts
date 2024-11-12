@@ -14,4 +14,4 @@ interface Embedding {
   object: string;
 }
 
-export { Embedding };
+export type { Embedding };

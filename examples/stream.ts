@@ -1,5 +1,5 @@
 import 'dotenv';
-import { GigaChatClient } from 'gigachat';
+import GigaChatClient from 'gigachat';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,11 +11,9 @@ async function main() {
     timeout: 600,
     model: 'GigaChat',
   });
-  const response = await client.stream('Напиши сочинение про слона');
-
-  response.on('data', (chunk) => {
-    process.stdout.write(chunk.choices[0].delta.content);
-  });
+  for await (const chunk of client.stream('Напиши сочинение про слона')) {
+    process.stdout.write(chunk.choices[0]?.delta.content || '');
+  }
 }
 
 main();

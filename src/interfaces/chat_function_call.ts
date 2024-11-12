@@ -6,4 +6,4 @@ interface ChatFunctionCall {
   partial_arguments?: { [key: string]: any };
 }
 
-export { ChatFunctionCall };
+export type { ChatFunctionCall };

@@ -18,4 +18,4 @@ interface UploadedFile {
   purpose: string;
 }
 
-export { UploadedFile };
+export type { UploadedFile };

@@ -9,4 +9,4 @@ interface TokensCount {
   object: string;
 }
 
-export { TokensCount };
+export type { TokensCount };

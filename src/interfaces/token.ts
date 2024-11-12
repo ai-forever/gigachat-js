@@ -6,4 +6,4 @@ interface Token {
   exp: number;
 }
 
-export { Token };
+export type { Token };

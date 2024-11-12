@@ -18,7 +18,7 @@ export function parseChunk<T>(line: string): T | null {
       if (value === '[DONE]') {
         return null;
       } else {
-        return JSON.parse(value);
+        return value ? JSON.parse(value) : null;
       }
     }
   } catch (e) {

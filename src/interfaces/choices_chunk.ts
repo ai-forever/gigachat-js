@@ -11,4 +11,4 @@ interface ChoicesChunk {
   finish_reason?: string;
 }
 
-export { ChoicesChunk };
+export type { ChoicesChunk };

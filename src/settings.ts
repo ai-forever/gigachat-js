@@ -1,9 +1,5 @@
 const ENV_PREFIX = 'GIGACHAT_';
 
-const BASE_URL = process.env[`${ENV_PREFIX}BASE_URL`] || 'https://gigachat.devices.sberbank.ru/api/v1';
-const AUTH_URL = process.env[`${ENV_PREFIX}AUTH_URL`] || 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
-const SCOPE = process.env[`${ENV_PREFIX}SCOPE`] || 'GIGACHAT_API_PERS';
-
 interface Settings {
   /** Адрес относительно которого выполняются запросы */
   baseUrl: string;
@@ -58,6 +54,10 @@ interface Settings {
 }
 
 function getDefaultSettings(): Settings {
+  const BASE_URL = process.env[`${ENV_PREFIX}BASE_URL`] || 'https://gigachat.devices.sberbank.ru/api/v1';
+  const AUTH_URL =
+    process.env[`${ENV_PREFIX}AUTH_URL`] || 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
+  const SCOPE = process.env[`${ENV_PREFIX}SCOPE`] || 'GIGACHAT_API_PERS';
   return {
     baseUrl: BASE_URL,
     authUrl: AUTH_URL,
@@ -79,4 +79,6 @@ function getDefaultSettings(): Settings {
   } as Settings;
 }
 
-export { Settings, getDefaultSettings, ENV_PREFIX };
+export type { Settings };
+
+export { getDefaultSettings, ENV_PREFIX };

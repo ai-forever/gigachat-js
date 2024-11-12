@@ -45,4 +45,4 @@ interface Chat {
   flags?: string[];
 }
 
-export { Chat };
+export type { Chat };

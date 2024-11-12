@@ -14,4 +14,4 @@ interface ChatCompletionChunk {
   object: string;
 }
 
-export { ChatCompletionChunk };
+export type { ChatCompletionChunk };

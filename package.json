@@ -1,5 +1,5 @@
 {
-  "name": "gigachat-dvsh",
+  "name": "gigachat",
   "version": "1.0.0",
   "description": "The official TypeScript library for the GigaChat API",
   "types": "dist/index.d.ts",
@@ -9,8 +9,9 @@
     "format": "prettier --write --cache --cache-strategy metadata . !dist",
     "lint": "./scripts/lint",
     "fix": "./scripts/format",
-    "build": "tsc"
+    "build": "./scripts/build"
   },
+  "private": false,
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -18,6 +19,33 @@
     "axios": "^1.7.7",
     "base-64": "^1.0.0",
     "uuid": "^11.0.3"
+  },
+  "imports": {
+    "gigachat": ".",
+    "gigachat/*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./*.mjs": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.mjs"
+    },
+    "./*.js": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "require": "./dist/*.js",
+      "default": "./dist/*.mjs"
+    }
   },
   "devDependencies": {
     "@types/base-64": "^1.0.2",
@@ -31,6 +59,7 @@
     "prettier": "^3.3.3",
     "prettier-2": "^99.9.9",
     "ts-node": "^10.9.2",
+    "tsc-multi": "^1.1.0",
     "typescript": "^5.6.3"
   }
 }

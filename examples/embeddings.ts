@@ -1,5 +1,5 @@
 import 'dotenv';
-import { GigaChatClient } from 'gigachat';
+import GigaChatClient from 'gigachat';
 import * as dotenv from 'dotenv';
 
 dotenv.config();

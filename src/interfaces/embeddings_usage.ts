@@ -3,4 +3,4 @@ interface EmbeddingsUsage {
   prompt_tokens: number;
 }
 
-export { EmbeddingsUsage };
+export type { EmbeddingsUsage };

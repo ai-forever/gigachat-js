@@ -9,4 +9,4 @@ interface Model {
   owned_by: string;
 }
 
-export { Model };
+export type { Model };

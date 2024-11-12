@@ -11,4 +11,4 @@ interface FunctionParameters {
   required?: string[];
 }
 
-export { FunctionParameters };
+export type { FunctionParameters };

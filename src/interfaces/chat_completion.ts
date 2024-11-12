@@ -18,4 +18,4 @@ interface ChatCompletion {
   object: string;
 }
 
-export { ChatCompletion };
+export type { ChatCompletion };

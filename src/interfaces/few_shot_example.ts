@@ -6,4 +6,4 @@ interface FewShotExample {
   params: { [key: string]: any };
 }
 
-export { FewShotExample };
+export type { FewShotExample };

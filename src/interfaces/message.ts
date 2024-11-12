@@ -27,4 +27,4 @@ interface Message {
   id?: any;
 }
 
-export { Message };
+export type { Message };

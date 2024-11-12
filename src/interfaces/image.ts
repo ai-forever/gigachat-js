@@ -3,4 +3,4 @@ interface Image {
   content: string;
 }
 
-export { Image };
+export type { Image };

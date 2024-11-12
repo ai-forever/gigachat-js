@@ -17,6 +17,7 @@ import {
   AccessToken,
   Chat,
   ChatCompletion,
+  ChatCompletionChunk,
   Embeddings,
   Image,
   MessageRole,
@@ -26,29 +27,45 @@ import {
   TokensCount,
   UploadedFile,
 } from './interfaces';
-import { Readable } from 'stream';
 import * as https from 'node:https';
-import { getDefaultSettings, Settings } from 'gigachat/settings';
+import { getDefaultSettings, Settings } from './settings';
 
 const GIGACHAT_MODEL = 'GigaChat';
 
 interface BaseClientConfig {
+  /** Адрес относительно которого выполняются запросы */
   baseUrl?: string;
+  /** Адрес для запроса токена доступа OAuth 2.0 */
   authUrl?: string;
+  /** Авторизационные данные */
   credentials?: string;
+  /** Версия API, к которой предоставляется доступ */
   scope?: string;
+  /** JWE токен */
   accessToken?: string;
+  /** Название модели, от которой нужно получить ответ */
   model?: string;
+  /** Параметр цензуры */
   profanityCheck?: boolean;
+  /** Имя пользователя */
   user?: string;
+  /** Пароль */
   password?: string;
+  /** Таймаут в секундах */
   timeout?: number;
+  /** Проверка SSL-сертификатов */
   verifySslCerts?: boolean;
+  /** Детализация запросов в консоли */
   verbose?: boolean;
+  /** Путь к файлу с CA-бандлом */
   caBundleFile?: string;
+  /** Путь к файлу сертификата */
   certFile?: string;
+  /** Путь к файлу ключа */
   keyFile?: string;
+  /** Пароль для ключевого файла */
   keyFilePassword?: string;
+  /** Флаги, включающие особенные фичи */
   flags?: string[];
 }
 
@@ -57,6 +74,26 @@ class GigaChatClient {
   public _authClient: AxiosInstance;
   public _settings: Settings;
   protected _accessToken?: AccessToken;
+
+  constructor(config: BaseClientConfig) {
+    this._settings = { ...getDefaultSettings(), ...config } as Settings;
+
+    if (this._settings.accessToken) {
+      this._accessToken = {
+        access_token: this._settings.accessToken,
+        expires_at: 0,
+      };
+    }
+    this._client = axios.create(this._getAxiosConfig());
+    this._authClient = axios.create(this._getAuthAxiosConfig());
+
+    if (this._settings.accessToken) {
+      this._accessToken = {
+        access_token: this._settings.accessToken,
+        expires_at: 0,
+      };
+    }
+  }
 
   protected get token(): string | undefined {
     return this._accessToken?.access_token;
@@ -90,26 +127,6 @@ class GigaChatClient {
     chat.profanity_check = chat.profanity_check ?? this._settings.profanityCheck;
     chat.flags = chat.flags ?? this._settings.flags;
     return chat;
-  }
-
-  constructor(config: BaseClientConfig) {
-    this._settings = { ...getDefaultSettings(), ...config } as Settings;
-
-    if (this._settings.accessToken) {
-      this._accessToken = {
-        access_token: this._settings.accessToken,
-        expires_at: 0,
-      };
-    }
-    this._client = axios.create(this._getAxiosConfig());
-    this._authClient = axios.create(this._getAuthAxiosConfig());
-
-    if (this._settings.accessToken) {
-      this._accessToken = {
-        access_token: this._settings.accessToken,
-        expires_at: 0,
-      };
-    }
   }
 
   private _getAxiosConfig() {
@@ -245,15 +262,31 @@ class GigaChatClient {
     );
   }
 
-  public async stream(payload: Chat | Record<string, any> | string): Promise<Readable> {
+  public async *stream(payload: Chat | Record<string, any> | string): AsyncIterable<ChatCompletionChunk> {
     const chat = this.parseChat(payload);
 
-    return this._decorator(() =>
-      stream_chat(this._client, {
-        chat,
-        accessToken: this.token,
-      }),
-    );
+    if (this.useAuth) {
+      if (this.checkValidityToken()) {
+        try {
+          for await (const chunk of stream_chat(this._client, { chat, accessToken: this.token })) {
+            yield chunk;
+          }
+          return;
+        } catch (error) {
+          if (error instanceof AuthenticationError) {
+            console.warn('AUTHENTICATION ERROR');
+            this.resetToken();
+          } else {
+            throw error;
+          }
+        }
+      }
+      await this.updateToken();
+    }
+
+    for await (const chunk of stream_chat(this._client, { chat, accessToken: this.token })) {
+      yield chunk;
+    }
   }
 
   private _buildAccessToken(token: Token): AccessToken {
@@ -264,4 +297,4 @@ class GigaChatClient {
   }
 }
 
-export { GigaChatClient };
+export default GigaChatClient;

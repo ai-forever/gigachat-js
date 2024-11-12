@@ -8,4 +8,4 @@ interface Models {
   object: string;
 }
 
-export { Models };
+export type { Models };

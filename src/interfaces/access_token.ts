@@ -6,4 +6,4 @@ interface AccessToken {
   expires_at: number;
 }
 
-export { AccessToken };
+export type { AccessToken };

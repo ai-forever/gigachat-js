@@ -6,4 +6,4 @@ interface FunctionCall {
   arguments?: { [key: string]: any };
 }
 
-export { FunctionCall };
+export type { FunctionCall };

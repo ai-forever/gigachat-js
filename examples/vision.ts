@@ -1,4 +1,4 @@
-import { GigaChatClient } from 'gigachat';
+import GigaChatClient from 'gigachat';
 import * as dotenv from 'dotenv';
 import { readFile } from 'fs/promises';
 import * as path from 'node:path';
@@ -26,7 +26,7 @@ async function main() {
     ],
     temperature: 0.1,
   });
-  console.log(response.choices[0].message.content);
+  console.log(response.choices[0]?.message.content);
 }
 
 main();

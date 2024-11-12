@@ -12,4 +12,4 @@ interface MessageChunk {
   function_call?: FunctionCall;
 }
 
-export { MessageChunk };
+export type { MessageChunk };

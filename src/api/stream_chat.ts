@@ -2,7 +2,6 @@ import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, parseChunk } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Chat, ChatCompletionChunk } from '../interfaces';
-import { Readable } from 'stream';
 
 const EVENT_STREAM = 'text/event-stream';
 
@@ -46,29 +45,31 @@ function splitLines(data: string): string[] {
   return data.split(/\r?\n/).filter((line) => line.trim() !== '');
 }
 
-export async function stream_chat(client: AxiosInstance, args: GetChatStreamArgs): Promise<Readable> {
+export async function* stream_chat(
+  client: AxiosInstance,
+  args: GetChatStreamArgs,
+): AsyncIterable<ChatCompletionChunk> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   checkResponse(response);
-  const stream = new Readable({
-    objectMode: true,
-    read() {},
-  });
 
-  response.data.on('data', (data: Buffer) => {
-    const lines = splitLines(data.toString());
-    lines.forEach((line) => {
+  for await (const chunk of response.data) {
+    const lines = splitLines(chunk.toString());
+    for (const line of lines) {
       const chunk = parseChunk<ChatCompletionChunk>(line);
       if (chunk) {
-        stream.push(chunk);
+        yield chunk;
       }
-    });
-  });
-  response.data.on('end', () => {
-    stream.push(null);
-  });
-  response.data.on('error', (error: any) => {
-    stream.destroy(error);
-  });
-  return stream;
+    }
+  }
+
+  // response.data.on('data', (data: Buffer) => {
+
+  // });
+  // response.data.on('end', () => {
+  //   stream.push(null);
+  // });
+  // response.data.on('error', (error: any) => {
+  //   stream.destroy(error);
+  // });
 }

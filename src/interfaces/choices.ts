@@ -11,4 +11,4 @@ interface Choices {
   finish_reason?: string;
 }
 
-export { Choices };
+export type { Choices };

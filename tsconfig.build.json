@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["dist/src"],
+  "compilerOptions": {
+    "rootDir": "./dist/src",
+    "paths": {
+      "gigachat/*": ["dist/src/*"],
+      "gigachat": ["dist/src/index.ts"]
+    },
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "pretty": true,
+    "sourceMap": true
+  }
+}

@@ -7,4 +7,4 @@ interface Usage {
   total_tokens: number;
 }
 
-export { Usage };
+export type { Usage };

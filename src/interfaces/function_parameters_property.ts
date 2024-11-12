@@ -15,4 +15,4 @@ interface FunctionParametersProperty {
   properties?: { [key: string]: FunctionParametersProperty };
 }
 
-export { FunctionParametersProperty };
+export type { FunctionParametersProperty };
