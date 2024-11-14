@@ -2,6 +2,7 @@ import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, parseChunk } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Chat, ChatCompletionChunk } from '../interfaces';
+import { Readable } from 'stream';
 
 const EVENT_STREAM = 'text/event-stream';
 
@@ -62,14 +63,36 @@ export async function* stream_chat(
       }
     }
   }
+}
 
-  // response.data.on('data', (data: Buffer) => {
+export async function stream_chat_readable(
+  client: AxiosInstance,
+  args: GetChatStreamArgs,
+): Promise<Readable> {
+  const config = getRequestConfig(args);
+  const stream = new Readable({
+    objectMode: true,
+    read() {},
+  });
 
-  // });
-  // response.data.on('end', () => {
-  //   stream.push(null);
-  // });
-  // response.data.on('error', (error: any) => {
-  //   stream.destroy(error);
-  // });
+  const response = await client.request(config);
+  checkResponse(response);
+
+  response.data.on('data', (chunk: Buffer) => {
+    const lines = splitLines(chunk.toString());
+    lines.forEach((line) => {
+      const chatChunk = parseChunk(line);
+      if (chatChunk) {
+        stream.push(chatChunk);
+      }
+    });
+  });
+  response.data.on('end', () => {
+    stream.push(null);
+  });
+  response.data.on('error', (error: any) => {
+    stream.destroy(error);
+  });
+
+  return stream;
 }

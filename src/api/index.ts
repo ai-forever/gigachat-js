@@ -7,4 +7,4 @@ export { get_models } from './get_models';
 export { post_embeddings } from './post_embeddings';
 export { post_files } from './post_files';
 export { post_tokens_count } from './post_tokens_count';
-export { stream_chat } from './stream_chat';
+export { stream_chat, stream_chat_readable } from './stream_chat';

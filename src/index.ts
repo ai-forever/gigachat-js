@@ -12,6 +12,7 @@ import {
   post_token,
   post_tokens_count,
   stream_chat,
+  stream_chat_readable,
 } from './api';
 import {
   AccessToken,
@@ -28,6 +29,7 @@ import {
   UploadedFile,
 } from './interfaces';
 import { getDefaultSettings, Settings } from './settings';
+import { Readable } from 'stream';
 
 const GIGACHAT_MODEL = 'GigaChat';
 
@@ -256,6 +258,16 @@ class GigaChat {
     const chat = this.parseChat(payload);
     return this._decorator(() =>
       post_chat(this._client, {
+        chat,
+        accessToken: this.token,
+      }),
+    );
+  }
+
+  public async stream_readable(payload: Chat | Record<string, any> | string): Promise<Readable> {
+    const chat = this.parseChat(payload);
+    return this._decorator(() =>
+      stream_chat_readable(this._client, {
         chat,
         accessToken: this.token,
       }),
