@@ -1,11 +1,11 @@
 import 'dotenv';
-import GigaChatClient from 'gigachat';
+import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
 async function main() {
-  const client = new GigaChatClient({
+  const client = new GigaChat({
     profanityCheck: false,
     verifySslCerts: false,
     timeout: 600,

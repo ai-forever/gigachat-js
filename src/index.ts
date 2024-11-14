@@ -27,7 +27,6 @@ import {
   TokensCount,
   UploadedFile,
 } from './interfaces';
-import * as https from 'node:https';
 import { getDefaultSettings, Settings } from './settings';
 
 const GIGACHAT_MODEL = 'GigaChat';
@@ -57,19 +56,21 @@ interface BaseClientConfig {
   verifySslCerts?: boolean;
   /** Детализация запросов в консоли */
   verbose?: boolean;
-  /** Путь к файлу с CA-бандлом */
-  caBundleFile?: string;
-  /** Путь к файлу сертификата */
-  certFile?: string;
-  /** Путь к файлу ключа */
-  keyFile?: string;
-  /** Пароль для ключевого файла */
-  keyFilePassword?: string;
+  /** CA-бандл */
+  caBundle?: string | Buffer | Array<string | Buffer>;
+  /** Сертификат */
+  cert?: string | Buffer | Array<string | Buffer>;
+  /** SSL ключ */
+  key?: string | Buffer | Array<string | Buffer>;
+  /** Пароль для SSL ключа */
+  keyPassword?: string;
   /** Флаги, включающие особенные фичи */
   flags?: string[];
+  /** HTTPS Agent, который прокидывается в Axios клиент */
+  httpsAgent?: any;
 }
 
-class GigaChatClient {
+class GigaChat {
   public _client: AxiosInstance;
   public _authClient: AxiosInstance;
   public _settings: Settings;
@@ -129,37 +130,36 @@ class GigaChatClient {
     return chat;
   }
 
+  private _getHttpsAgent() {
+    const https = require('node:https');
+    const httpsAgent = new https.Agent({ rejectUnauthorized: this._settings.verifySslCerts });
+    if (this._settings.caBundle) {
+      httpsAgent.options.ca = this._settings.caBundle;
+    }
+    if (this._settings.cert) {
+      httpsAgent.options.cert = this._settings.cert;
+      httpsAgent.options.key = this._settings.key;
+      httpsAgent.options.passphrase = this._settings.keyPassword;
+    }
+    return httpsAgent;
+  }
+
   private _getAxiosConfig() {
+    const notBrowser = typeof window === 'undefined' && typeof require !== 'undefined';
     const config: any = {
       baseURL: this._settings.baseUrl,
       timeout: this._settings.timeout * 1000,
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
-      }),
+      httpsAgent: notBrowser ? this._settings.httpsAgent || this._getHttpsAgent() : null,
     };
-
-    if (this._settings.caBundleFile) {
-      config.httpsAgent = this._settings.caBundleFile;
-    }
-    if (this._settings.certFile) {
-      config.httpsAgent = {
-        cert: this._settings.certFile,
-        key: this._settings.keyFile,
-        passphrase: this._settings.keyFilePassword,
-      };
-    }
     return config;
   }
 
   private _getAuthAxiosConfig() {
+    const notBrowser = typeof window === 'undefined' && typeof require !== 'undefined';
     const config: CreateAxiosDefaults = {
-      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      httpsAgent: notBrowser ? this._settings.httpsAgent || this._getHttpsAgent() : null,
       timeout: this._settings.timeout * 1000,
     };
-
-    // if (this._settings.caBundleFile) {
-    //     config.httpsAgent = this._settings.caBundleFile;
-    // }
     return config;
   }
 
@@ -297,4 +297,4 @@ class GigaChatClient {
   }
 }
 
-export default GigaChatClient;
+export default GigaChat;

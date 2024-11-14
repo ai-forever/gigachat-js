@@ -1,12 +1,11 @@
-import GigaChatClient from 'gigachat';
+import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { readFile } from 'fs/promises';
 import * as path from 'node:path';
 dotenv.config();
 
 async function main() {
-  const client = new GigaChatClient({
-    profanityCheck: false,
+  const client = new GigaChat({
     verifySslCerts: false,
     timeout: 600,
     model: 'GigaChat-Pro',

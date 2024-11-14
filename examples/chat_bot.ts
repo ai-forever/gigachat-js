@@ -1,11 +1,11 @@
 import * as readline from 'node:readline';
-import GigaChatClient from 'gigachat';
+import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Message, MessageRole } from '../src/interfaces';
 
 dotenv.config();
 
-const client = new GigaChatClient({
+const client = new GigaChat({
   profanityCheck: false,
   verifySslCerts: false,
   timeout: 600,
