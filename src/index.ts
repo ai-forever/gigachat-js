@@ -29,11 +29,11 @@ import {
   UploadedFile,
 } from './interfaces';
 import { getDefaultSettings, Settings } from './settings';
-import { Readable } from 'stream';
+import { EventEmitter } from 'events';
 
 const GIGACHAT_MODEL = 'GigaChat';
 
-interface BaseClientConfig {
+export interface GigaChatClientConfig {
   /** Адрес относительно которого выполняются запросы */
   baseUrl?: string;
   /** Адрес для запроса токена доступа OAuth 2.0 */
@@ -72,13 +72,13 @@ interface BaseClientConfig {
   httpsAgent?: any;
 }
 
-class GigaChat {
+export class GigaChat {
   public _client: AxiosInstance;
   public _authClient: AxiosInstance;
   public _settings: Settings;
   protected _accessToken?: AccessToken;
 
-  constructor(config: BaseClientConfig) {
+  constructor(config: GigaChatClientConfig) {
     this._settings = { ...getDefaultSettings(), ...config } as Settings;
 
     if (this._settings.accessToken) {
@@ -264,7 +264,7 @@ class GigaChat {
     );
   }
 
-  public async stream_readable(payload: Chat | Record<string, any> | string): Promise<Readable> {
+  public async stream_readable(payload: Chat | Record<string, any> | string): Promise<EventEmitter> {
     const chat = this.parseChat(payload);
     return this._decorator(() =>
       stream_chat_readable(this._client, {

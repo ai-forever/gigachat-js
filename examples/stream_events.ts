@@ -12,7 +12,7 @@ async function main() {
     model: 'GigaChat',
   });
   const readable = await client.stream_readable('Напиши сочинение про слона');
-  readable.on('data', (chunk) => {
+  readable.on('chunk', (chunk) => {
     process.stdout.write(chunk.choices[0]?.delta.content || '');
   });
 }

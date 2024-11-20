@@ -1,6 +1,6 @@
 {
   "name": "gigachat",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "description": "The official TypeScript library for the GigaChat API",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
@@ -24,9 +24,6 @@
     "gigachat": ".",
     "gigachat/*": "./src/*"
   },
-  "browser": {
-    "https": false
-  },
   "exports": {
     ".": {
       "require": {
@@ -43,6 +40,16 @@
     "./*.js": {
       "types": "./dist/*.d.ts",
       "default": "./dist/*.js"
+    },
+    "./interfaces/*": {
+      "types": "./dist/interfaces/*.d.ts",
+      "require": "./dist/interfaces/*.js",
+      "default": "./dist/interfaces/*.mjs"
+    },
+    "./interfaces": {
+      "types": "./dist/interfaces/index.d.ts",
+      "require": "./dist/interfaces/index.js",
+      "default": "./dist/interfaces/index.mjs"
     },
     "./*": {
       "types": "./dist/*.d.ts",

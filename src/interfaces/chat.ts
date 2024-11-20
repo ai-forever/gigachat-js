@@ -2,8 +2,6 @@ import { ChatFunctionCall } from './chat_function_call';
 import { Function } from './function';
 import { Message } from './message';
 
-type FunctionCall = 'auto' | 'none' | ChatFunctionCall;
-
 interface Chat {
   /** Название модели, от которой нужно получить ответ */
   model?: string;
@@ -36,7 +34,7 @@ interface Chat {
   profanity_check?: boolean;
 
   /** Правила вызова функций */
-  function_call?: FunctionCall;
+  function_call?: ChatFunctionCall;
 
   /** Набор функций, которые могут быть вызваны моделью */
   functions?: Function[];
