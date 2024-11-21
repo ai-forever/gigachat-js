@@ -1,7 +1,7 @@
 import * as readline from 'node:readline';
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
-import { Message, MessageRole } from '../src/interfaces';
+import { Message } from '../src/interfaces';
 
 dotenv.config();
 
@@ -27,7 +27,7 @@ async function main() {
       return;
     }
     messages.push({
-      role: MessageRole.USER,
+      role: 'user',
       content: question,
     });
     let responseContent = '';
@@ -41,7 +41,7 @@ async function main() {
     }
     process.stdout.write('\n');
     messages.push({
-      role: MessageRole.ASSISTANT,
+      role: 'assistant',
       content: responseContent,
     });
     process.stdout.write('Q: ');

@@ -21,7 +21,6 @@ import {
   ChatCompletionChunk,
   Embeddings,
   Image,
-  MessageRole,
   Model,
   Models,
   Token,
@@ -120,7 +119,7 @@ export class GigaChat {
     let chat: Chat;
     if (typeof payload === 'string') {
       chat = {
-        messages: [{ role: MessageRole.USER, content: payload }],
+        messages: [{ role: 'user', content: payload }],
       };
     } else {
       chat = payload as Chat;
