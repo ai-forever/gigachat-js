@@ -17,6 +17,7 @@ function getRequestConfig({ chat, accessToken }: GetChatArgs): AxiosRequestConfi
     url: '/chat/completions',
     data: chat,
     headers: headers,
+    validateStatus: () => true,
   } as AxiosRequestConfig;
 }
 
@@ -24,9 +25,11 @@ function buildResponse(response: AxiosResponse): ChatCompletion {
   if (response.status === 200) {
     return response.data as ChatCompletion;
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 

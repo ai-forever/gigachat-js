@@ -1,6 +1,6 @@
 {
   "name": "gigachat",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "The official TypeScript library for the GigaChat API",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
@@ -17,7 +17,6 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
-    "base-64": "^1.0.0",
     "uuid": "^11.0.3"
   },
   "imports": {
@@ -58,7 +57,6 @@
     }
   },
   "devDependencies": {
-    "@types/base-64": "^1.0.2",
     "@types/node": "^22.9.0",
     "@typescript-eslint/eslint-plugin": "^8.14.0",
     "@typescript-eslint/parser": "^8.14.0",

@@ -1,6 +1,6 @@
 interface Image {
-  /** Изображение в base64 кодировке */
-  content: string;
+  /** Изображение */
+  content: any;
 }
 
 export type { Image };

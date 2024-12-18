@@ -2,7 +2,6 @@ import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { USER_AGENT } from '../constants';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { AccessToken } from '../interfaces';
-import * as base64 from 'base-64';
 import { v4 as uuidv4 } from 'uuid';
 
 interface AuthArgs {
@@ -39,11 +38,10 @@ function buildResponse(response: AxiosResponse): AccessToken {
 }
 
 function validateCredentials(credentials: string): void {
-  try {
-    base64.decode(credentials);
-  } catch (error) {
+  const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+  if (!base64regex.test(credentials)) {
     console.warn(
-      'Invalid credentials format. Please use only base64 credentials (Authorization data, not client secret!)',
+      'Possibly invalid credentials format. Please use only base64 credentials (Authorization data, not client secret!)',
     );
   }
 }

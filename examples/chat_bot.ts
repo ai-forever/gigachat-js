@@ -2,14 +2,19 @@ import * as readline from 'node:readline';
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Message } from '../src/interfaces';
+import { Agent } from 'node:https';
+import fs from 'node:fs';
 
 dotenv.config();
 
+const httpsAgent = new Agent({
+  ca: fs.readFileSync('russiantrustedca.pem'),
+});
+
 const client = new GigaChat({
-  profanityCheck: false,
-  verifySslCerts: false,
   timeout: 600,
   model: 'GigaChat',
+  httpsAgent: httpsAgent,
 });
 
 const messages: Message[] = [];

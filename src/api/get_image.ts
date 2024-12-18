@@ -2,7 +2,6 @@ import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Image } from '../interfaces/image';
-import * as base64 from 'base-64';
 
 interface GetImageArgs {
   fileId: string;
@@ -17,12 +16,13 @@ function getRequestConfig({ fileId, accessToken }: GetImageArgs): AxiosRequestCo
     method: 'GET',
     url: `/files/${fileId}/content`,
     headers: headers,
+    responseEncoding: 'binary',
   } as AxiosRequestConfig;
 }
 
 function buildResponse(response: AxiosResponse): Image {
   if (response.status === 200) {
-    return { content: base64.encode(response.data) };
+    return { content: response.data };
   } else if (response.status === 401) {
     throw new AuthenticationError(response.config.url, response.status, response.data, response.headers);
   } else {

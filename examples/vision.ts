@@ -1,20 +1,26 @@
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
-import { readFile } from 'fs/promises';
 import * as path from 'node:path';
+import { Agent } from 'node:https';
+import fs from 'node:fs';
+
 dotenv.config();
+
+const httpsAgent = new Agent({
+  ca: fs.readFileSync('russiantrustedca.pem'),
+});
 
 async function main() {
   const client = new GigaChat({
-    verifySslCerts: false,
     timeout: 600,
     model: 'GigaChat-Pro',
+    httpsAgent: httpsAgent,
   });
   const filePath = path.resolve(__dirname, './media/cat.jpg');
-  const buffer = await readFile(filePath);
-  const fileName = filePath.split('/').pop() || 'image.jpg';
-  const file = new File([buffer], fileName, { type: 'image/jpeg' });
+  const buffer = fs.readFileSync(filePath);
+  const file = new File([buffer], 'image.jpg', { type: 'image/jpeg' });
   const uploadedFile = await client.uploadFile(file);
+
   const response = await client.chat({
     messages: [
       {

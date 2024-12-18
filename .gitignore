@@ -6,3 +6,4 @@ dist
 .idea/
 tmp
 */.env
+examples/image.jpg

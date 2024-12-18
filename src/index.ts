@@ -53,22 +53,44 @@ export interface GigaChatClientConfig {
   password?: string;
   /** Таймаут в секундах */
   timeout?: number;
-  /** Проверка SSL-сертификатов */
-  verifySslCerts?: boolean;
   /** Детализация запросов в консоли */
   verbose?: boolean;
-  /** CA-бандл */
-  caBundle?: string | Buffer | Array<string | Buffer>;
-  /** Сертификат */
-  cert?: string | Buffer | Array<string | Buffer>;
-  /** SSL ключ */
-  key?: string | Buffer | Array<string | Buffer>;
-  /** Пароль для SSL ключа */
-  keyPassword?: string;
   /** Флаги, включающие особенные фичи */
   flags?: string[];
   /** HTTPS Agent, который прокидывается в Axios клиент */
   httpsAgent?: any;
+}
+
+export interface DetectedImage {
+  uuid?: string;
+  postfix?: string;
+}
+
+export interface DetectedVideo {
+  uuid?: string;
+  cover_uuid?: string;
+  postfix?: string;
+}
+
+export function detectImage(message: string): DetectedImage | null {
+  const regex = /<img\ssrc="(?<uuid>.+?)"\sfuse="true"\/>(?<postfix>.*)?/ms;
+  const match = regex.exec(message);
+  if (!match || !match.groups) return null;
+  return {
+    uuid: match.groups['uuid'],
+    postfix: match.groups['postfix'],
+  };
+}
+
+export function detectVideo(message: string): DetectedVideo | null {
+  const regex = /<video\scover="(?<cover_uuid>.+?)"\ssrc="(?<uuid>.+?)"\sfuse="true"\/>(?<postfix>.+)?/ms;
+  const match = regex.exec(message);
+  if (!match || !match.groups) return null;
+  return {
+    uuid: match.groups['uuid'],
+    cover_uuid: match.groups['cover_uuid'],
+    postfix: match.groups['postfix'],
+  };
 }
 
 export class GigaChat {
@@ -131,34 +153,18 @@ export class GigaChat {
     return chat;
   }
 
-  private _getHttpsAgent() {
-    const https = require('node:https');
-    const httpsAgent = new https.Agent({ rejectUnauthorized: this._settings.verifySslCerts });
-    if (this._settings.caBundle) {
-      httpsAgent.options.ca = this._settings.caBundle;
-    }
-    if (this._settings.cert) {
-      httpsAgent.options.cert = this._settings.cert;
-      httpsAgent.options.key = this._settings.key;
-      httpsAgent.options.passphrase = this._settings.keyPassword;
-    }
-    return httpsAgent;
-  }
-
   private _getAxiosConfig() {
-    const notBrowser = typeof window === 'undefined' && typeof require !== 'undefined';
     const config: any = {
       baseURL: this._settings.baseUrl,
       timeout: this._settings.timeout * 1000,
-      httpsAgent: notBrowser ? this._settings.httpsAgent || this._getHttpsAgent() : null,
+      httpsAgent: this._settings.httpsAgent,
     };
     return config;
   }
 
   private _getAuthAxiosConfig() {
-    const notBrowser = typeof window === 'undefined' && typeof require !== 'undefined';
     const config: CreateAxiosDefaults = {
-      httpsAgent: notBrowser ? this._settings.httpsAgent || this._getHttpsAgent() : null,
+      httpsAgent: this._settings.httpsAgent,
       timeout: this._settings.timeout * 1000,
     };
     return config;
