@@ -1,4 +1,5 @@
 export * from './access_token';
+export * from './balance';
 export * from './chat';
 export * from './chat_completion';
 export * from './chat_completion_chunk';
@@ -23,3 +24,4 @@ export * from './tokens_count';
 export * from './token';
 export * from './uploaded_file';
 export * from './usage';
+export * from './with_x_headers';

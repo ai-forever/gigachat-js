@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { buildHeaders, parseChunk } from './utils';
+import { buildHeaders, buildXHeaders, parseChunk } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { Chat, ChatCompletionChunk } from '../interfaces';
+import { Chat, ChatCompletionChunk, WithXHeaders } from '../interfaces';
 import { EventEmitter } from 'events';
 
 const EVENT_STREAM = 'text/event-stream';
@@ -21,7 +21,6 @@ function getRequestConfig({ chat, accessToken }: GetChatStreamArgs): AxiosReques
     url: '/chat/completions',
     data: { ...chat, ...{ stream: true } },
     headers: headers,
-    responseType: 'stream',
   } as AxiosRequestConfig;
 }
 
@@ -36,9 +35,11 @@ function checkResponse(response: AxiosResponse): void {
   if (response.status === 200) {
     checkContentType(response);
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 
@@ -49,7 +50,7 @@ function splitLines(data: string): string[] {
 export async function* stream_chat(
   client: AxiosInstance,
   args: GetChatStreamArgs,
-): AsyncIterable<ChatCompletionChunk> {
+): AsyncIterable<ChatCompletionChunk & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   checkResponse(response);
@@ -59,7 +60,7 @@ export async function* stream_chat(
     for (const line of lines) {
       const chunk = parseChunk<ChatCompletionChunk>(line);
       if (chunk) {
-        yield chunk;
+        yield buildXHeaders(response, chunk as ChatCompletionChunk);
       }
     }
   }
@@ -80,7 +81,7 @@ export async function stream_chat_readable(
     lines.forEach((line) => {
       const chatChunk = parseChunk(line);
       if (chatChunk) {
-        emitter.emit('chunk', chatChunk); // Отправка события с новым чанком
+        emitter.emit('chunk', buildXHeaders(response, chatChunk as ChatCompletionChunk)); // Отправка события с новым чанком
       }
     });
   });

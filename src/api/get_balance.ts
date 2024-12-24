@@ -1,29 +1,26 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { Chat } from '../interfaces/chat';
-import { ChatCompletion } from 'gigachat/interfaces';
-import { WithXHeaders } from 'gigachat/interfaces';
+import { Balance, WithXHeaders } from '../interfaces';
 
-interface GetChatArgs {
-  chat: Chat;
+interface BalanceArgs {
   accessToken?: string;
 }
 
-function getRequestConfig({ chat, accessToken }: GetChatArgs): AxiosRequestConfig {
+function getRequestConfig({ accessToken }: BalanceArgs): AxiosRequestConfig {
   const headers = buildHeaders(accessToken);
 
   return {
-    method: 'POST',
-    url: '/chat/completions',
-    data: chat,
+    method: 'GET',
+    url: '/balance',
     headers: headers,
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): ChatCompletion & WithXHeaders {
+function buildResponse(response: AxiosResponse): Balance & WithXHeaders {
+  response.headers;
   if (response.status === 200) {
-    return buildXHeaders(response, response.data as ChatCompletion);
+    return buildXHeaders(response, response.data as Balance);
   } else if (response.status === 401) {
     console.error(response.data);
     throw new AuthenticationError(response);
@@ -33,10 +30,7 @@ function buildResponse(response: AxiosResponse): ChatCompletion & WithXHeaders {
   }
 }
 
-export async function post_chat(
-  client: AxiosInstance,
-  args: GetChatArgs,
-): Promise<ChatCompletion & WithXHeaders> {
+export async function get_balance(client: AxiosInstance, args: BalanceArgs): Promise<Balance & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   return buildResponse(response);

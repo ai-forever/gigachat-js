@@ -1,7 +1,7 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { buildHeaders } from './utils';
+import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { TokensCount } from '../interfaces';
+import { Tokens, WithXHeaders } from '../interfaces';
 
 interface GetTokensCountArgs {
   input: string[];
@@ -22,21 +22,23 @@ function getRequestConfig({ input, model, accessToken }: GetTokensCountArgs): Ax
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): TokensCount[] {
+function buildResponse(response: AxiosResponse): Tokens & WithXHeaders {
   if (response.status === 200) {
-    return response.data.map((row: any) => row as TokensCount);
+    return buildXHeaders(response, { tokens: response.data } as Tokens);
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 
 export async function post_tokens_count(
   client: AxiosInstance,
   args: GetTokensCountArgs,
-): Promise<TokensCount[]> {
+): Promise<Tokens & WithXHeaders> {
   const config = getRequestConfig(args);
-  const response = await axios.request(config);
+  const response = await client.request(config);
   return buildResponse(response);
 }

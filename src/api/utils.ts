@@ -1,4 +1,6 @@
 import { USER_AGENT } from '../constants';
+import { AxiosResponse } from 'axios';
+import { WithXHeaders } from 'gigachat/interfaces';
 
 export function buildHeaders(accessToken?: string): Record<string, string> {
   const headers: Record<string, string> = {};
@@ -26,6 +28,24 @@ export function parseChunk<T>(line: string): T | null {
     throw e;
   }
   return null;
+}
+
+export function buildXHeaders<T>(response: AxiosResponse, data: T): T & WithXHeaders {
+  const headers = response.headers;
+  const withXHeaders: WithXHeaders = {
+    xHeaders: {},
+  };
+  if (headers) {
+    withXHeaders.xHeaders = {
+      xRequestID: headers['x-request-id'],
+      xSessionID: headers['x-session-id'],
+      xClientID: headers['x-client-id'],
+    };
+  }
+  return {
+    ...data,
+    ...withXHeaders,
+  };
 }
 
 export { USER_AGENT };

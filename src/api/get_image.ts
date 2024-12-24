@@ -1,7 +1,8 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { buildHeaders } from './utils';
+import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Image } from '../interfaces/image';
+import { WithXHeaders } from 'gigachat/interfaces';
 
 interface GetImageArgs {
   fileId: string;
@@ -20,17 +21,19 @@ function getRequestConfig({ fileId, accessToken }: GetImageArgs): AxiosRequestCo
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): Image {
+function buildResponse(response: AxiosResponse): Image & WithXHeaders {
   if (response.status === 200) {
-    return { content: response.data };
+    return buildXHeaders(response, { content: response.data } as Image);
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 
-export async function get_image(client: AxiosInstance, args: GetImageArgs): Promise<Image> {
+export async function get_image(client: AxiosInstance, args: GetImageArgs): Promise<Image & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   return buildResponse(response);

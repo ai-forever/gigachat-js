@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { buildHeaders } from './utils';
+import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { Embeddings } from '../interfaces';
+import { Embeddings, WithXHeaders } from '../interfaces';
 
 interface GetEmbeddingsArgs {
   input: string[];
@@ -20,17 +20,22 @@ function getRequestConfig({ input, model, accessToken }: GetEmbeddingsArgs): Axi
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): Embeddings {
+function buildResponse(response: AxiosResponse): Embeddings & WithXHeaders {
   if (response.status === 200) {
-    return response.data as Embeddings;
+    return buildXHeaders(response, response.data as Embeddings);
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 
-export async function post_embeddings(client: AxiosInstance, args: GetEmbeddingsArgs): Promise<Embeddings> {
+export async function post_embeddings(
+  client: AxiosInstance,
+  args: GetEmbeddingsArgs,
+): Promise<Embeddings & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   return buildResponse(response);

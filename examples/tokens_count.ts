@@ -16,10 +16,8 @@ async function main() {
     model: 'GigaChat',
     httpsAgent: httpsAgent,
   });
-  const resp = await client.chat({
-    messages: [{ role: 'user', content: 'Привет, как дела?' }],
-  });
-  console.log(resp.choices[0]?.message.content);
+  const resp = await client.tokensCount(['Привет, как дела?', 'Как дела, как дела']);
+  console.log(resp);
 }
 
 main();

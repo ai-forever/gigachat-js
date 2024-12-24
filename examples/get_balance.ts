@@ -16,10 +16,7 @@ async function main() {
     model: 'GigaChat',
     httpsAgent: httpsAgent,
   });
-  const resp = await client.chat({
-    messages: [{ role: 'user', content: 'Привет, как дела?' }],
-  });
-  console.log(resp.choices[0]?.message.content);
+  console.log(await client.balance());
 }
 
 main();

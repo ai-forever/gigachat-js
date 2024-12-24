@@ -2,6 +2,7 @@ import axios, { AxiosInstance, CreateAxiosDefaults } from 'axios';
 
 import { AuthenticationError } from './exceptions';
 import {
+  get_balance,
   get_image,
   get_model,
   get_models,
@@ -16,6 +17,7 @@ import {
 } from './api';
 import {
   AccessToken,
+  Balance,
   Chat,
   ChatCompletion,
   ChatCompletionChunk,
@@ -24,8 +26,9 @@ import {
   Model,
   Models,
   Token,
-  TokensCount,
+  Tokens,
   UploadedFile,
+  WithXHeaders,
 } from './interfaces';
 import { getDefaultSettings, Settings } from './settings';
 import { EventEmitter } from 'events';
@@ -153,21 +156,21 @@ export class GigaChat {
     return chat;
   }
 
-  private _getAxiosConfig() {
-    const config: any = {
+  private _getAxiosConfig(): CreateAxiosDefaults {
+    return {
       baseURL: this._settings.baseUrl,
       timeout: this._settings.timeout * 1000,
       httpsAgent: this._settings.httpsAgent,
+      validateStatus: () => true,
     };
-    return config;
   }
 
-  private _getAuthAxiosConfig() {
-    const config: CreateAxiosDefaults = {
+  private _getAuthAxiosConfig(): CreateAxiosDefaults {
+    return {
       httpsAgent: this._settings.httpsAgent,
       timeout: this._settings.timeout * 1000,
+      validateStatus: () => true,
     };
-    return config;
   }
 
   public async updateToken(): Promise<void> {
@@ -210,7 +213,7 @@ export class GigaChat {
     return await call();
   }
 
-  public async tokensCount(input: string[], model?: string): Promise<TokensCount[]> {
+  public async tokensCount(input: string[], model?: string): Promise<Tokens & WithXHeaders> {
     if (!model) {
       model = this._settings.model || GIGACHAT_MODEL;
     }
@@ -221,6 +224,10 @@ export class GigaChat {
         accessToken: this.token,
       }),
     );
+  }
+
+  public async balance(): Promise<Balance & WithXHeaders> {
+    return this._decorator(() => get_balance(this._client, { accessToken: this.token }));
   }
 
   public async embeddings(texts: string[], model: string = 'Embeddings'): Promise<Embeddings> {
@@ -259,7 +266,7 @@ export class GigaChat {
     return this._decorator(() => post_files(this._client, { file, purpose, accessToken: this.token }));
   }
 
-  public async chat(payload: Chat | Record<string, any> | string): Promise<ChatCompletion> {
+  public async chat(payload: Chat | Record<string, any> | string): Promise<ChatCompletion & WithXHeaders> {
     const chat = this.parseChat(payload);
     return this._decorator(() =>
       post_chat(this._client, {
@@ -279,7 +286,9 @@ export class GigaChat {
     );
   }
 
-  public async *stream(payload: Chat | Record<string, any> | string): AsyncIterable<ChatCompletionChunk> {
+  public async *stream(
+    payload: Chat | Record<string, any> | string,
+  ): AsyncIterable<ChatCompletionChunk & WithXHeaders> {
     const chat = this.parseChat(payload);
 
     if (this.useAuth) {

@@ -1,3 +1,7 @@
+interface Tokens {
+  tokens: TokensCount[];
+}
+
 interface TokensCount {
   /** Количество токенов в соответствующей строке */
   tokens: number;
@@ -9,4 +13,4 @@ interface TokensCount {
   object: string;
 }
 
-export type { TokensCount };
+export type { TokensCount, Tokens };

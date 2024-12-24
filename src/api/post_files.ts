@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse, RawAxiosRequestConfig } from 'axios';
-import { buildHeaders } from './utils';
+import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { UploadedFile } from '../interfaces';
+import { UploadedFile, WithXHeaders } from '../interfaces';
 
 interface UploadFileArgs {
   file: File;
@@ -24,17 +24,22 @@ function getRequestConfig({ file, purpose = 'general', accessToken }: UploadFile
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): UploadedFile {
+function buildResponse(response: AxiosResponse): UploadedFile & WithXHeaders {
   if (response.status === 200) {
-    return response.data as UploadedFile;
+    return buildXHeaders(response, response.data as UploadedFile);
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 
-export async function post_files(client: AxiosInstance, args: UploadFileArgs): Promise<UploadedFile> {
+export async function post_files(
+  client: AxiosInstance,
+  args: UploadFileArgs,
+): Promise<UploadedFile & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   return buildResponse(response);

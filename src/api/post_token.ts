@@ -1,7 +1,8 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { buildHeaders } from './utils';
+import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Token } from '../interfaces/token';
+import { WithXHeaders } from 'gigachat/interfaces';
 
 interface TokenArgs {
   user: string;
@@ -22,17 +23,19 @@ function getRequestConfig(args: TokenArgs): AxiosRequestConfig {
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): Token {
+function buildResponse(response: AxiosResponse): Token & WithXHeaders {
   if (response.status === 200) {
-    return response.data as Token;
+    return buildXHeaders(response, response.data as Token);
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 
-export async function post_token(client: AxiosInstance, args: TokenArgs): Promise<Token> {
+export async function post_token(client: AxiosInstance, args: TokenArgs): Promise<Token & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   return buildResponse(response);

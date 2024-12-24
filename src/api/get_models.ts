@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { buildHeaders } from './utils';
+import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { Models } from '../interfaces';
+import { Models, WithXHeaders } from '../interfaces';
 
 interface GetModelsArgs {
   accessToken?: string;
@@ -17,17 +17,19 @@ function getRequestConfig({ accessToken }: GetModelsArgs): AxiosRequestConfig {
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): Models {
+function buildResponse(response: AxiosResponse): Models & WithXHeaders {
   if (response.status === 200) {
-    return response.data as Models;
+    return buildXHeaders(response, response.data as Models);
   } else if (response.status === 401) {
-    throw new AuthenticationError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new AuthenticationError(response);
   } else {
-    throw new ResponseError(response.config.url!, response.status, response.data, response.headers);
+    console.error(response.data);
+    throw new ResponseError(response);
   }
 }
 
-export async function get_models(client: AxiosInstance, args: GetModelsArgs): Promise<Models> {
+export async function get_models(client: AxiosInstance, args: GetModelsArgs): Promise<Models & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   return buildResponse(response);
