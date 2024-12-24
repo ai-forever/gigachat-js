@@ -7,7 +7,7 @@ import fs from 'node:fs';
 dotenv.config();
 
 const httpsAgent = new Agent({
-  ca: fs.readFileSync('russiantrustedca.pem'),
+  rejectUnauthorized: false,
 });
 
 async function main() {

@@ -2,12 +2,11 @@ import 'dotenv';
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Agent } from 'node:https';
-import fs from 'node:fs';
 
 dotenv.config();
 
 const httpsAgent = new Agent({
-  ca: fs.readFileSync('russiantrustedca.pem'),
+  rejectUnauthorized: false,
 });
 
 async function main() {
@@ -16,6 +15,7 @@ async function main() {
     timeout: 600,
     model: 'GigaChat',
     httpsAgent: httpsAgent,
+    dangerouslyAllowBrowser: true,
   });
   const readable = await client.stream_readable('Напиши сочинение про слона');
   readable.on('chunk', (chunk) => {

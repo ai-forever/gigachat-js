@@ -3,12 +3,11 @@ import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Message } from '../src/interfaces';
 import { Agent } from 'node:https';
-import fs from 'node:fs';
 
 dotenv.config();
 
 const httpsAgent = new Agent({
-  ca: fs.readFileSync('russiantrustedca.pem'),
+  rejectUnauthorized: false,
 });
 
 const client = new GigaChat({

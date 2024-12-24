@@ -62,6 +62,8 @@ export interface GigaChatClientConfig {
   flags?: string[];
   /** HTTPS Agent, который прокидывается в Axios клиент */
   httpsAgent?: any;
+  /** Включает работу библиотеку в браузере */
+  dangerouslyAllowBrowser?: boolean;
 }
 
 export interface DetectedImage {
@@ -96,6 +98,17 @@ export function detectVideo(message: string): DetectedVideo | null {
   };
 }
 
+function isRunningInBrowser() {
+  return (
+    // @ts-ignore
+    typeof window !== 'undefined' &&
+    // @ts-ignore
+    typeof window.document !== 'undefined' &&
+    // @ts-ignore
+    typeof navigator !== 'undefined'
+  );
+}
+
 export class GigaChat {
   public _client: AxiosInstance;
   public _authClient: AxiosInstance;
@@ -104,6 +117,11 @@ export class GigaChat {
 
   constructor(config: GigaChatClientConfig) {
     this._settings = { ...getDefaultSettings(), ...config } as Settings;
+    if (!this._settings.dangerouslyAllowBrowser && isRunningInBrowser()) {
+      throw new Error(
+        'Скорее всего вы пытаетесь запустить библиотеку GigaChat в браузере. Такое использование выключено по умолчанию, так как при таком использовании вы рискуете разоблачить ваш токен GigaChat третьим лицам! Чтобы включить использование библиотеки проставьте параметр dangerouslyAllowBrowser. ',
+      );
+    }
 
     if (this._settings.accessToken) {
       this._accessToken = {
@@ -279,10 +297,14 @@ export class GigaChat {
   public async stream_readable(payload: Chat | Record<string, any> | string): Promise<EventEmitter> {
     const chat = this.parseChat(payload);
     return this._decorator(() =>
-      stream_chat_readable(this._client, {
-        chat,
-        accessToken: this.token,
-      }),
+      stream_chat_readable(
+        this._client,
+        {
+          chat,
+          accessToken: this.token,
+        },
+        this._settings.dangerouslyAllowBrowser,
+      ),
     );
   }
 
@@ -294,7 +316,12 @@ export class GigaChat {
     if (this.useAuth) {
       if (this.checkValidityToken()) {
         try {
-          for await (const chunk of stream_chat(this._client, { chat, accessToken: this.token })) {
+          const stream = await stream_chat(
+            this._client,
+            { chat, accessToken: this.token },
+            this._settings.dangerouslyAllowBrowser,
+          );
+          for await (const chunk of stream) {
             yield chunk;
           }
           return;
@@ -309,8 +336,12 @@ export class GigaChat {
       }
       await this.updateToken();
     }
-
-    for await (const chunk of stream_chat(this._client, { chat, accessToken: this.token })) {
+    const stream = await stream_chat(
+      this._client,
+      { chat, accessToken: this.token },
+      this._settings.dangerouslyAllowBrowser,
+    );
+    for await (const chunk of stream) {
       yield chunk;
     }
   }

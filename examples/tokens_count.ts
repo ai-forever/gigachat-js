@@ -2,10 +2,9 @@ import 'dotenv';
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Agent } from 'node:https';
-import * as fs from 'node:fs';
 
 const httpsAgent = new Agent({
-  ca: fs.readFileSync('russiantrustedca.pem'),
+  rejectUnauthorized: false,
 });
 
 dotenv.config();

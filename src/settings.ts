@@ -39,6 +39,9 @@ interface Settings {
 
   /** HTTPS Agent, который прокидывается в Axios клиент */
   httpsAgent?: any;
+
+  /** Включает работу библиотеку в браузере */
+  dangerouslyAllowBrowser?: boolean;
 }
 
 function getDefaultSettings(): Settings {
