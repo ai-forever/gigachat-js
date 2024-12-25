@@ -1,6 +1,7 @@
 {
   "imports": {
     "gigachat": "npm:gigachat",
-    "dotenv": "npm:dotenv"
+    "dotenv": "npm:dotenv",
+    "events": "node:events"
   }
 }
