@@ -32,6 +32,7 @@ import {
 } from './interfaces';
 import { getDefaultSettings, Settings } from './settings';
 import { EventEmitter } from 'events';
+import { isRunningInBrowser } from './api/utils';
 
 const GIGACHAT_MODEL = 'GigaChat';
 
@@ -96,17 +97,6 @@ export function detectVideo(message: string): DetectedVideo | null {
     cover_uuid: match.groups['cover_uuid'],
     postfix: match.groups['postfix'],
   };
-}
-
-function isRunningInBrowser() {
-  return (
-    // @ts-ignore
-    typeof window !== 'undefined' &&
-    // @ts-ignore
-    typeof window.document !== 'undefined' &&
-    // @ts-ignore
-    typeof navigator !== 'undefined'
-  );
 }
 
 export class GigaChat {

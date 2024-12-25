@@ -2,7 +2,7 @@ import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, buildXHeaders, parseChunk } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Chat, ChatCompletionChunk } from '../interfaces';
-import { EventEmitter } from 'node:events';
+import { EventEmitter } from 'events';
 
 const EVENT_STREAM = 'text/event-stream';
 
@@ -19,9 +19,6 @@ function getRequestConfig(
   if (!isBrowser) {
     headers['Accept'] = EVENT_STREAM;
     headers['Cache-Control'] = 'no-store';
-  }
-  if (isBrowser) {
-    delete headers['User-Agent'];
   }
 
   const config = {

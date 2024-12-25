@@ -8,8 +8,12 @@ export function buildHeaders(accessToken?: string): Record<string, string> {
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`;
   }
+  if (!isRunningInBrowser()) {
+    headers['User-Agent'] = USER_AGENT;
+  } else {
+    headers['X-User-Agent'] = USER_AGENT;
+  }
 
-  headers['User-Agent'] = USER_AGENT;
   return headers;
 }
 
@@ -46,6 +50,17 @@ export function buildXHeaders<T>(response: AxiosResponse, data: T): T & WithXHea
     ...data,
     ...withXHeaders,
   };
+}
+
+export function isRunningInBrowser() {
+  return (
+    // @ts-ignore
+    typeof window !== 'undefined' &&
+    // @ts-ignore
+    typeof window.document !== 'undefined' &&
+    // @ts-ignore
+    typeof navigator !== 'undefined'
+  );
 }
 
 export { USER_AGENT };
