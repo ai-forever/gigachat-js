@@ -1,7 +1,7 @@
 import * as readline from 'node:readline';
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
-import { Message } from '../src/interfaces';
+import { Message } from 'gigachat/interfaces';
 import { Agent } from 'node:https';
 
 dotenv.config();

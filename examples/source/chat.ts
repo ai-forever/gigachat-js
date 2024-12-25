@@ -1,5 +1,4 @@
-import 'dotenv';
-import { GigaChat } from 'gigachat';
+import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Agent } from 'node:https';
 
@@ -15,7 +14,9 @@ async function main() {
     model: 'GigaChat',
     httpsAgent: httpsAgent,
   });
-  const resp = await client.chat('Привет, как дела?');
+  const resp = await client.chat({
+    messages: [{ role: 'user', content: 'Привет, как дела?' }],
+  });
   console.log(resp.choices[0]?.message.content);
 }
 

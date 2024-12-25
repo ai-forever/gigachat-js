@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "gigachat": "npm:gigachat",
+    "dotenv": "npm:dotenv"
+  }
+}

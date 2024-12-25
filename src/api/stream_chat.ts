@@ -2,7 +2,7 @@ import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, buildXHeaders, parseChunk } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Chat, ChatCompletionChunk } from '../interfaces';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 
 const EVENT_STREAM = 'text/event-stream';
 
