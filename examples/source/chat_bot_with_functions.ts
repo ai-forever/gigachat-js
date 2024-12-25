@@ -73,83 +73,78 @@ function get_product_info(args: any) {
   return PRODUCTS_DB.filter((product) => args.ids.includes(product.id));
 }
 
-async function chat() {
-  return await client.chat({
-    functions: [
-      {
-        name: 'get_products',
-        description: 'Получает какие продукты есть в магазине',
-        parameters: {
-          type: 'object',
-          properties: {
-            arg: {
-              type: 'string',
-            },
-          },
+const functions = [
+  {
+    name: 'get_products',
+    description: 'Получает какие продукты есть в магазине',
+    parameters: {
+      type: 'object',
+      properties: {
+        arg: {
+          type: 'string',
         },
-        return_parameters: {
-          type: 'object',
-          properties: {
-            name: {
-              type: 'string',
-              description: 'Название позиции',
-            },
-            id: {
-              type: 'string',
-              description: 'ID позиции',
-            },
+      },
+    },
+    return_parameters: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Название позиции',
+        },
+        id: {
+          type: 'string',
+          description: 'ID позиции',
+        },
+      },
+    },
+  },
+  {
+    name: 'get_product_info',
+    description: 'Получает информацию об определенном продукте в магазине',
+    parameters: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: {
+            type: 'number',
+            description: 'ID продуктов',
           },
         },
       },
-      {
-        name: 'get_product_info',
-        description: 'Получает информацию об определенном продукте в магазине',
-        parameters: {
-          type: 'object',
-          properties: {
-            ids: {
-              type: 'array',
-              items: {
-                type: 'number',
-                description: 'ID продуктов',
+    },
+    return_parameters: {
+      type: 'object',
+      properties: {
+        products: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+                description: 'Название позиции',
               },
-            },
-          },
-        },
-        return_parameters: {
-          type: 'object',
-          properties: {
-            products: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  name: {
-                    type: 'string',
-                    description: 'Название позиции',
-                  },
-                  id: {
-                    type: 'string',
-                    description: 'ID позиции',
-                  },
-                  quantity: {
-                    type: 'string',
-                    description: 'Количество',
-                  },
-                  price: {
-                    type: 'string',
-                    description: 'Цена',
-                  },
-                },
+              id: {
+                type: 'string',
+                description: 'ID позиции',
+              },
+              quantity: {
+                type: 'string',
+                description: 'Количество',
+              },
+              price: {
+                type: 'string',
+                description: 'Цена',
               },
             },
           },
         },
       },
-    ],
-    messages: messages,
-  });
-}
+    },
+  },
+];
 
 async function main() {
   process.stdout.write('Q: ');
@@ -162,7 +157,11 @@ async function main() {
       role: 'user',
       content: question,
     });
-    let response = await chat();
+    let response = await client.chat({
+      functions: functions,
+      messages,
+      function_call: 'auto',
+    });
     if (response.choices[0]?.message) messages.push(response.choices[0].message);
     if (response.choices[0]?.message.function_call) {
       let function_result: any = {};
@@ -178,7 +177,10 @@ async function main() {
         role: 'function',
         content: JSON.stringify(function_result),
       });
-      response = await chat();
+      response = await client.chat({
+        functions,
+        messages,
+      });
     }
     process.stdout.write(`AI: ${response.choices[0]?.message.content}\n`);
     process.stdout.write('Q: ');

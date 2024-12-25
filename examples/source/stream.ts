@@ -1,4 +1,3 @@
-import 'dotenv';
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Agent } from 'node:https';

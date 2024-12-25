@@ -7,3 +7,7 @@ dist
 tmp
 */.env
 examples/image.jpg
+examples/source/image.jpg
+examples/.env
+examples/source/.env
+deno.lock

@@ -1,4 +1,3 @@
-import 'dotenv';
 import { GigaChat, detectImage } from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Agent } from 'node:https';

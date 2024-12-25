@@ -16,7 +16,7 @@ async function main() {
     model: 'GigaChat-Pro',
     httpsAgent: httpsAgent,
   });
-  const filePath = path.resolve(__dirname, './media/cat.jpg');
+  const filePath = path.resolve(__dirname, '../media/cat.jpg');
   const buffer = fs.readFileSync(filePath);
   const file = new File([buffer], 'image.jpg', { type: 'image/jpeg' });
   const uploadedFile = await client.uploadFile(file);

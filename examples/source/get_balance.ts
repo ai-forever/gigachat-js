@@ -1,4 +1,3 @@
-import 'dotenv';
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Agent } from 'node:https';
@@ -15,8 +14,7 @@ async function main() {
     model: 'GigaChat',
     httpsAgent: httpsAgent,
   });
-  const resp = await client.tokensCount(['Привет, как дела?', 'Как дела, как дела']);
-  console.log(resp);
+  console.log(await client.balance());
 }
 
 main();
