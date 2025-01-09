@@ -1,10 +1,11 @@
 {
   "name": "gigachat",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "The official TypeScript library for the GigaChat API",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",
+  "repository": "github:ai-forever/gigachat-js",
   "scripts": {
     "format": "prettier --write --cache --cache-strategy metadata . !dist",
     "lint": "./scripts/lint",

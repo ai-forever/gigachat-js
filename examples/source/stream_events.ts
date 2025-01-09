@@ -14,7 +14,6 @@ async function main() {
     timeout: 600,
     model: 'GigaChat',
     httpsAgent: httpsAgent,
-    dangerouslyAllowBrowser: true,
   });
   const readable = await client.stream_readable('Напиши сочинение про слона');
   readable.on('chunk', (chunk) => {
