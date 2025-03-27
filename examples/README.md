@@ -14,3 +14,5 @@
 - [Получение списка доступных моделей](get_models.ipynb)
 - [Получение текущего баланса токенов на аккаунте](get_balance.ipynb)
 - [Подсчет токенов из текста](tokens_count.ipynb)
+- [Работа с исключениями](exception_handling.ipynb)
+- [Проверка текста на ИИ](ai_check.ipynb)
