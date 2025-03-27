@@ -16,6 +16,9 @@ interface UploadedFile {
 
   /** Предполагаемое назначение файла */
   purpose: string;
+
+  /** Доступность файла */
+  access_policy?: string;
 }
 
 export type { UploadedFile };
