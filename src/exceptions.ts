@@ -1,20 +1,25 @@
+import { AxiosResponse } from 'axios';
+
 export class GigaChatException extends Error {
-  constructor(...args: any[]) {
-    super(args.join());
+  public response: AxiosResponse;
+
+  constructor(response: AxiosResponse) {
+    super(response.data);
     this.name = 'GigaChatException';
+    this.response = response;
   }
 }
 
 export class ResponseError extends GigaChatException {
-  constructor(...args: any[]) {
-    super(...args);
+  constructor(response: AxiosResponse) {
+    super(response);
     this.name = 'ResponseError';
   }
 }
 
 export class AuthenticationError extends ResponseError {
-  constructor(...args: any[]) {
-    super(...args);
+  constructor(response: AxiosResponse) {
+    super(response);
     this.name = 'AuthenticationError';
   }
 }

@@ -6,10 +6,14 @@ import {
   get_image,
   get_model,
   get_models,
+  get_file,
+  get_files,
+  post_ai_check,
   post_auth,
   post_chat,
   post_embeddings,
   post_files,
+  post_files_delete,
   post_token,
   post_tokens_count,
   stream_chat,
@@ -17,10 +21,12 @@ import {
 } from './api';
 import {
   AccessToken,
+  AICheckResult,
   Balance,
   Chat,
   ChatCompletion,
   ChatCompletionChunk,
+  DeletedFile,
   Embeddings,
   Image,
   Model,
@@ -28,6 +34,7 @@ import {
   Token,
   Tokens,
   UploadedFile,
+  UploadedFiles,
   WithXHeaders,
 } from './interfaces';
 import { getDefaultSettings, Settings } from './settings';
@@ -234,6 +241,16 @@ export class GigaChat {
     );
   }
 
+  public async aiCheck(input: string, model: string): Promise<AICheckResult & WithXHeaders> {
+    return this._decorator(() =>
+      post_ai_check(this._client, {
+        input,
+        model,
+        accessToken: this.token,
+      }),
+    );
+  }
+
   public async balance(): Promise<Balance & WithXHeaders> {
     return this._decorator(() => get_balance(this._client, { accessToken: this.token }));
   }
@@ -272,6 +289,18 @@ export class GigaChat {
 
   public async uploadFile(file: File, purpose: 'general' | 'assistant' = 'general'): Promise<UploadedFile> {
     return this._decorator(() => post_files(this._client, { file, purpose, accessToken: this.token }));
+  }
+
+  public async getFile(file: string): Promise<UploadedFile> {
+    return this._decorator(() => get_file(this._client, { file, accessToken: this.token }));
+  }
+
+  public async getFiles(): Promise<UploadedFiles> {
+    return this._decorator(() => get_files(this._client, { accessToken: this.token }));
+  }
+
+  public async deleteFile(file: string): Promise<DeletedFile> {
+    return this._decorator(() => post_files_delete(this._client, { file, accessToken: this.token }));
   }
 
   public async chat(payload: Chat | Record<string, any> | string): Promise<ChatCompletion & WithXHeaders> {

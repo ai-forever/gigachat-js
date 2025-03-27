@@ -9,3 +9,7 @@ export { post_files } from './post_files';
 export { post_tokens_count } from './post_tokens_count';
 export { stream_chat, stream_chat_readable } from './stream_chat';
 export { get_balance } from './get_balance';
+export { get_file } from './get_file';
+export { get_files } from './get_files';
+export { post_files_delete } from './post_files_delete';
+export { post_ai_check } from './post_ai_check';
