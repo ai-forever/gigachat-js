@@ -1,3 +1,3 @@
-const USER_AGENT = 'GigaChat-python-lib';
+const USER_AGENT = 'GigaChat-js-lib';
 
 export { USER_AGENT };

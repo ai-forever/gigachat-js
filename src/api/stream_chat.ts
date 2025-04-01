@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, buildXHeaders, parseChunk } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
 import { Chat, ChatCompletionChunk } from '../interfaces';
@@ -14,6 +14,7 @@ interface GetChatStreamArgs {
 function getRequestConfig(
   { chat, accessToken }: GetChatStreamArgs,
   isBrowser: boolean = false,
+  abortSignal?: AbortSignal,
 ): AxiosRequestConfig {
   const headers = buildHeaders(accessToken);
   if (!isBrowser) {
@@ -27,6 +28,7 @@ function getRequestConfig(
     responseType: 'stream',
     data: { ...chat, ...{ stream: true } },
     headers: headers,
+    signal: abortSignal,
   } as AxiosRequestConfig;
   if (isBrowser) {
     config.adapter = 'fetch';
@@ -62,6 +64,7 @@ export async function stream_chat(
   client: AxiosInstance,
   args: GetChatStreamArgs,
   isBrowser: boolean = false,
+  abortSignal?: AbortSignal,
 ): Promise<any> {
   let done = false;
   const pushQueue: ChatCompletionChunk[] = [];
@@ -69,7 +72,7 @@ export async function stream_chat(
     resolve: (chunk: ChatCompletionChunk | undefined) => void;
     reject: (err: unknown) => void;
   }[] = [];
-  const readable = await stream_chat_readable(client, args, isBrowser);
+  const readable = await stream_chat_readable(client, args, isBrowser, abortSignal);
   function t() {
     return {
       next() {
@@ -111,8 +114,9 @@ export async function stream_chat_readable(
   client: AxiosInstance,
   args: GetChatStreamArgs,
   isBrowser: boolean = false,
+  abortSignal?: AbortSignal,
 ): Promise<EventEmitter> {
-  const config = getRequestConfig(args, isBrowser);
+  const config = getRequestConfig(args, isBrowser, abortSignal);
   const emitter = new EventEmitter();
 
   const response = await client.request(config);
@@ -150,7 +154,9 @@ export async function stream_chat_readable(
       emitter.emit('end'); // Отправка события завершения
     });
     response.data.on('error', (error: any) => {
-      emitter.emit('error', error); // Отправка события ошибки
+      if (!axios.isCancel(error)) {
+        emitter.emit('error', error); // Отправка события ошибки
+      }
     });
   }
 

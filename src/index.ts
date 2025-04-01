@@ -313,7 +313,10 @@ export class GigaChat {
     );
   }
 
-  public async stream_readable(payload: Chat | Record<string, any> | string): Promise<EventEmitter> {
+  public async stream_readable(
+    payload: Chat | Record<string, any> | string,
+    abortSignal?: AbortSignal,
+  ): Promise<EventEmitter> {
     const chat = this.parseChat(payload);
     return this._decorator(() =>
       stream_chat_readable(
@@ -323,12 +326,14 @@ export class GigaChat {
           accessToken: this.token,
         },
         this._settings.dangerouslyAllowBrowser,
+        abortSignal,
       ),
     );
   }
 
   public async *stream(
     payload: Chat | Record<string, any> | string,
+    abortSignal?: AbortSignal,
   ): AsyncIterable<ChatCompletionChunk & WithXHeaders> {
     const chat = this.parseChat(payload);
 
@@ -339,6 +344,7 @@ export class GigaChat {
             this._client,
             { chat, accessToken: this.token },
             this._settings.dangerouslyAllowBrowser,
+            abortSignal,
           );
           for await (const chunk of stream) {
             yield chunk;
@@ -359,6 +365,7 @@ export class GigaChat {
       this._client,
       { chat, accessToken: this.token },
       this._settings.dangerouslyAllowBrowser,
+      abortSignal,
     );
     for await (const chunk of stream) {
       yield chunk;
