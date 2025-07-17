@@ -193,11 +193,17 @@ export class GigaChat {
     //     return;
     // }
     if (this._settings.credentials) {
-      this._accessToken = await post_auth(this._authClient, {
+      const credData = await post_auth(this._authClient, {
         url: this._settings.authUrl,
         credentials: this._settings.credentials,
         scope: this._settings.scope,
       });
+      if ('tok' in credData) {
+        // @ts-ignore
+        this._accessToken = this._buildAccessToken(credData);
+      } else {
+        this._accessToken = credData;
+      }
       console.info('OAUTH UPDATE TOKEN');
     } else if (this._settings.user && this._settings.password) {
       const token = await post_token(this._client, {
