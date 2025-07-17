@@ -1,6 +1,6 @@
 {
   "name": "gigachat",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "The official TypeScript library for the GigaChat API",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
