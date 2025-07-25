@@ -23,10 +23,8 @@ function buildResponse(response: AxiosResponse): DeletedFile & WithXHeaders {
   if (response.status === 200) {
     return buildXHeaders(response, response.data as DeletedFile);
   } else if (response.status === 401) {
-    console.error(response.data);
     throw new AuthenticationError(response);
   } else {
-    console.error(response.data);
     throw new ResponseError(response);
   }
 }

@@ -25,10 +25,8 @@ function buildResponse(response: AxiosResponse): Image & WithXHeaders {
   if (response.status === 200) {
     return buildXHeaders(response, { content: response.data } as Image);
   } else if (response.status === 401) {
-    console.error(response.data);
     throw new AuthenticationError(response);
   } else {
-    console.error(response.data);
     throw new ResponseError(response);
   }
 }

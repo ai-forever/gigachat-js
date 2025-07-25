@@ -24,10 +24,8 @@ function buildResponse(response: AxiosResponse): AICheckResult & WithXHeaders {
   if (response.status === 200) {
     return buildXHeaders(response, response.data as AICheckResult);
   } else if (response.status === 401) {
-    console.error(response.data);
     throw new AuthenticationError(response);
   } else {
-    console.error(response.data);
     throw new ResponseError(response);
   }
 }

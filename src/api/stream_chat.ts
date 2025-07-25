@@ -48,10 +48,8 @@ function checkResponse(response: AxiosResponse): void {
   if (response.status === 200) {
     checkContentType(response);
   } else if (response.status === 401) {
-    console.error(response.data);
     throw new AuthenticationError(response);
   } else {
-    console.error(response.data);
     throw new ResponseError(response);
   }
 }
