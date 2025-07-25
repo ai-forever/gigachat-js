@@ -31,10 +31,8 @@ function buildResponse(response: AxiosResponse): AccessToken {
   if (response.status === 200) {
     return response.data as AccessToken;
   } else if (response.status === 401) {
-    console.error(response.data);
     throw new AuthenticationError(response);
   } else {
-    console.error(response.data);
     throw new ResponseError(response);
   }
 }

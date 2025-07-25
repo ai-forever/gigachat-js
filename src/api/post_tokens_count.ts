@@ -26,10 +26,8 @@ function buildResponse(response: AxiosResponse): Tokens & WithXHeaders {
   if (response.status === 200) {
     return buildXHeaders(response, { tokens: response.data } as Tokens);
   } else if (response.status === 401) {
-    console.error(response.data);
     throw new AuthenticationError(response);
   } else {
-    console.error(response.data);
     throw new ResponseError(response);
   }
 }
