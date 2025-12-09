@@ -1,3 +1,4 @@
+import { FinishReason } from './finish_reason';
 import { Message } from './message';
 
 interface Choices {
@@ -8,7 +9,7 @@ interface Choices {
   index: number;
 
   /** Причина завершения гипотезы */
-  finish_reason?: string;
+  finish_reason?: FinishReason;
 }
 
 export type { Choices };

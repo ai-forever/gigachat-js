@@ -1,3 +1,4 @@
+import { FinishReason } from './finish_reason';
 import { MessageChunk } from './message_chunk';
 
 interface ChoicesChunk {
@@ -8,7 +9,7 @@ interface ChoicesChunk {
   index: number;
 
   /** Причина завершения гипотезы */
-  finish_reason?: string;
+  finish_reason?: FinishReason;
 }
 
 export type { ChoicesChunk };

@@ -18,7 +18,6 @@ function getRequestConfig({ accessToken }: BalanceArgs): AxiosRequestConfig {
 }
 
 function buildResponse(response: AxiosResponse): Balance & WithXHeaders {
-  response.headers;
   if (response.status === 200) {
     return buildXHeaders(response, response.data as Balance);
   } else if (response.status === 401) {
