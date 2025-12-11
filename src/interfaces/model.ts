@@ -7,6 +7,9 @@ interface Model {
 
   /** Владелец модели */
   owned_by: string;
+
+  /** Тип модели */
+  type: 'chat' | 'aicheck' | 'embedder';
 }
 
 export type { Model };
