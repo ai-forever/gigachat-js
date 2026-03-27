@@ -8,8 +8,12 @@ import {
   get_models,
   get_file,
   get_files,
+  get_batch,
+  get_batches,
+  get_batch_status,
   post_ai_check,
   post_auth,
+  post_batch,
   post_chat,
   post_embeddings,
   post_files,
@@ -23,6 +27,10 @@ import {
   AccessToken,
   AICheckResult,
   Balance,
+  BATCH_METHOD,
+  BatchRequest,
+  BatchStatus,
+  BatchStatuses,
   Chat,
   ChatCompletion,
   ChatCompletionChunk,
@@ -271,6 +279,16 @@ export class GigaChat {
     );
   }
 
+  public async embeddingsBatch(payload: BatchRequest[]) {
+    return this._decorator(() =>
+      post_batch(this._client, {
+        batch: payload,
+        method: BATCH_METHOD.embedder,
+        accessToken: this.token,
+      }),
+    );
+  }
+
   public async getModels(): Promise<Models> {
     return this._decorator(() => get_models(this._client, { accessToken: this.token }));
   }
@@ -314,6 +332,34 @@ export class GigaChat {
     return this._decorator(() =>
       post_chat(this._client, {
         chat,
+        accessToken: this.token,
+      }),
+    );
+  }
+
+  public async chatsBatch(payload: BatchRequest[]) {
+    const batch = payload.map((task) => ({ ...task, request: this.parseChat(task.request) }));
+    return this._decorator(() =>
+      post_batch(this._client, {
+        batch,
+        method: BATCH_METHOD.chatCompletions,
+        accessToken: this.token,
+      }),
+    );
+  }
+
+  public async getBatch(fileId: string) {
+    return this._decorator(() => get_batch(this._client, { fileId, accessToken: this.token }));
+  }
+
+  public async getBatches(): Promise<BatchStatuses & WithXHeaders> {
+    return this._decorator(() => get_batches(this._client, { accessToken: this.token }));
+  }
+
+  public async getBatchStatus(batchId: string): Promise<BatchStatus & WithXHeaders> {
+    return this._decorator(() =>
+      get_batch_status(this._client, {
+        batchId,
         accessToken: this.token,
       }),
     );

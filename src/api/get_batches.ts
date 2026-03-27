@@ -1,26 +1,25 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { Embeddings, WithXHeaders, EmbeddingRequest } from '../interfaces';
+import { BatchStatuses, WithXHeaders } from '../interfaces';
 
-interface GetEmbeddingsArgs extends EmbeddingRequest {
+interface GetBatchesArgs {
   accessToken?: string;
 }
 
-function getRequestConfig({ input, model, accessToken }: GetEmbeddingsArgs): AxiosRequestConfig {
+function getRequestConfig({ accessToken }: GetBatchesArgs): AxiosRequestConfig {
   const headers = buildHeaders(accessToken);
 
   return {
-    method: 'POST',
-    url: '/embeddings',
-    data: { input, model },
+    method: 'GET',
+    url: `/batches`,
     headers: headers,
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): Embeddings & WithXHeaders {
+function buildResponse(response: AxiosResponse): BatchStatuses & WithXHeaders {
   if (response.status === 200) {
-    return buildXHeaders(response, response.data as Embeddings);
+    return buildXHeaders(response, { data: response.data } as BatchStatuses);
   } else if (response.status === 401) {
     throw new AuthenticationError(response);
   } else {
@@ -28,10 +27,10 @@ function buildResponse(response: AxiosResponse): Embeddings & WithXHeaders {
   }
 }
 
-export async function post_embeddings(
+export async function get_batches(
   client: AxiosInstance,
-  args: GetEmbeddingsArgs,
-): Promise<Embeddings & WithXHeaders> {
+  args: GetBatchesArgs,
+): Promise<BatchStatuses & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
   return buildResponse(response);
