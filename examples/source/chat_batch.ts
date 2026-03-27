@@ -83,10 +83,10 @@ async function main() {
   }
 
   // получаем файл с результатом пакетного запроса
-  const bachFile = await client.getBatch<ChatCompletion>(fileId);
+  const batchFile = await client.getBatch<ChatCompletion>(fileId);
 
   // обрабатываем ответы
-  const result = bachFile.content
+  const result = batchFile.content
     .map((chat) => `${taskList[chat.id]}\t = ${chat.result.choices[0].message.content}`)
     .join('\n');
 

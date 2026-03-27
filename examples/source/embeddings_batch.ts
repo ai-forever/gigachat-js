@@ -69,8 +69,8 @@ async function main() {
   }
 
   // получаем файл с результатом пакетного запроса
-  const bachFile = await client.getBatch<Embeddings>(fileId);
-  bachFile.content.map(console.log);
+  const batchFile = await client.getBatch<Embeddings>(fileId);
+  batchFile.content.map(console.log);
 
   // удаляем файл с сервера
   await client.deleteFile(fileId);
