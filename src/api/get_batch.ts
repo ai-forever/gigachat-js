@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { buildHeaders, buildXHeaders } from './utils';
 import { AuthenticationError, ResponseError } from '../exceptions';
-import { Batch, ChatCompletion } from '../interfaces';
+import { Batch, ChatCompletion, Embeddings } from '../interfaces';
 import { WithXHeaders } from 'gigachat/interfaces';
 
 interface GetBatchFileArgs {
@@ -21,7 +21,9 @@ function getRequestConfig({ fileId, accessToken }: GetBatchFileArgs): AxiosReque
   } as AxiosRequestConfig;
 }
 
-function buildResponse(response: AxiosResponse): Batch<ChatCompletion> & WithXHeaders {
+function buildResponse<T extends ChatCompletion | Embeddings>(
+  response: AxiosResponse,
+): Batch<T> & WithXHeaders {
   if (response.status === 200) {
     const result = buildXHeaders(response, { content: response.data });
     result.content = (result.content as string)
@@ -36,11 +38,11 @@ function buildResponse(response: AxiosResponse): Batch<ChatCompletion> & WithXHe
   }
 }
 
-export async function get_batch(
+export async function get_batch<T extends ChatCompletion | Embeddings>(
   client: AxiosInstance,
   args: GetBatchFileArgs,
-): Promise<Batch<ChatCompletion> & WithXHeaders> {
+): Promise<Batch<T> & WithXHeaders> {
   const config = getRequestConfig(args);
   const response = await client.request(config);
-  return buildResponse(response);
+  return buildResponse<T>(response);
 }

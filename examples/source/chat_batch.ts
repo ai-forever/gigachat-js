@@ -1,7 +1,7 @@
 import GigaChat from 'gigachat';
 import * as dotenv from 'dotenv';
 import { Agent } from 'node:https';
-import { BATCH_FILE_STATUS, BatchRequest } from 'gigachat/interfaces';
+import { BATCH_FILE_STATUS, BatchRequest, ChatCompletion } from 'gigachat/interfaces';
 
 const httpsAgent = new Agent({
   rejectUnauthorized: false,
@@ -83,7 +83,7 @@ async function main() {
   }
 
   // получаем файл с результатом пакетного запроса
-  const bachFile = await client.getBatch(fileId);
+  const bachFile = await client.getBatch<ChatCompletion>(fileId);
 
   // обрабатываем ответы
   const result = bachFile.content

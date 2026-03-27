@@ -27,6 +27,7 @@ import {
   AccessToken,
   AICheckResult,
   Balance,
+  Batch,
   BATCH_METHOD,
   BatchRequest,
   BatchStatus,
@@ -279,7 +280,7 @@ export class GigaChat {
     );
   }
 
-  public async embeddingsBatch(payload: BatchRequest[]) {
+  public async embeddingsBatch(payload: BatchRequest[]): Promise<BatchStatus & WithXHeaders> {
     return this._decorator(() =>
       post_batch(this._client, {
         batch: payload,
@@ -348,8 +349,10 @@ export class GigaChat {
     );
   }
 
-  public async getBatch(fileId: string) {
-    return this._decorator(() => get_batch(this._client, { fileId, accessToken: this.token }));
+  public async getBatch<T extends ChatCompletion | Embeddings>(
+    fileId: string,
+  ): Promise<Batch<T> & WithXHeaders> {
+    return this._decorator(() => get_batch<T>(this._client, { fileId, accessToken: this.token }));
   }
 
   public async getBatches(): Promise<BatchStatuses & WithXHeaders> {
