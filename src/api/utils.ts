@@ -19,7 +19,10 @@ export function buildHeaders(accessToken?: string): Record<string, string> {
 
 export function parseChunk<T>(line: string): T | null {
   try {
-    const [name, value] = line.split(': ');
+    const idx = line.indexOf(': ');
+    if (idx === -1) return null;
+    const name = line.substring(0, idx);
+    const value = line.substring(idx + 2);
     if (name === 'data') {
       if (value === '[DONE]') {
         return null;
