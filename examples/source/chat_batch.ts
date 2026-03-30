@@ -87,7 +87,7 @@ async function main() {
 
   // обрабатываем ответы
   const result = batchFile.content
-    .map((chat) => `${taskList[chat.id]}\t = ${chat.result.choices[0].message.content}`)
+    .map((chat) => `${taskList[chat.id]}\t = ${chat.result.choices[0]?.message.content}`)
     .join('\n');
 
   console.log(`Результат:\n${result}`);
