@@ -18,6 +18,7 @@ function getRequestConfig({ fileId, accessToken }: GetBatchFileArgs): AxiosReque
     url: `/files/${fileId}/content`,
     headers,
     responseEncoding: 'binary',
+    transformResponse: [(data) => data],
   } as AxiosRequestConfig;
 }
 
