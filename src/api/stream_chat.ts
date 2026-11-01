@@ -54,8 +54,30 @@ function checkResponse(response: AxiosResponse): void {
   }
 }
 
-function splitLines(data: string): string[] {
-  return data.split(/\r?\n/).filter((line) => line.trim() !== '');
+// Buffers a streaming UTF-8 text payload and yields complete lines. SSE
+// frames are delimited by '\n' (or '\r\n'), but TCP can deliver a single SSE
+// event across multiple `data` events — splitting mid-string inside a JSON
+// payload. A naive split-per-chunk feeds truncated lines to JSON.parse and
+// throws `SyntaxError: Unterminated string in JSON` synchronously inside the
+// 'data' handler, which surfaces as an uncaughtException and can crash the
+// host process.
+function createLineBuffer() {
+  let buffer = '';
+  return {
+    push(chunk: string): string[] {
+      buffer += chunk;
+      const parts = buffer.split(/\r?\n/);
+      // The last element is either '' (chunk ended on a newline) or a
+      // partial trailing line — keep it for the next chunk.
+      buffer = parts.pop() ?? '';
+      return parts.filter((line) => line.trim() !== '');
+    },
+    flush(): string[] {
+      const remainder = buffer;
+      buffer = '';
+      return remainder.trim() !== '' ? [remainder] : [];
+    },
+  };
 }
 
 export async function stream_chat(
@@ -120,35 +142,40 @@ export async function stream_chat_readable(
   const response = await client.request(config);
   checkResponse(response);
 
+  const lineBuffer = createLineBuffer();
+
+  const emitLines = (lines: string[]) => {
+    lines.forEach((line) => {
+      const chatChunk = parseChunk(line);
+      if (chatChunk) {
+        emitter.emit('chunk', buildXHeaders(response, chatChunk as ChatCompletionChunk)); // Отправка события с новым чанком
+      }
+    });
+  };
+
   if (isBrowser) {
+    const decoder = new TextDecoder();
     const reader = response.data.getReader();
     reader.read().then(function pump({ done, value }: { done: boolean; value: Uint8Array }) {
       if (done) {
+        // Flush trailing partial line — most servers end on a blank line, but
+        // be defensive in case the final SSE event is not newline-terminated.
+        emitLines(lineBuffer.flush());
         emitter.emit('end');
         return;
       } else {
-        const chunk = new TextDecoder().decode(value);
-        const lines = splitLines(chunk.toString());
-        lines.forEach((line) => {
-          const chatChunk = parseChunk(line);
-          if (chatChunk) {
-            emitter.emit('chunk', buildXHeaders(response, chatChunk as ChatCompletionChunk)); // Отправка события с новым чанком
-          }
-        });
+        // `stream: true` keeps multi-byte UTF-8 sequences split across chunks intact.
+        const chunk = decoder.decode(value, { stream: true });
+        emitLines(lineBuffer.push(chunk));
       }
       return reader.read().then(pump);
     });
   } else {
     response.data.on('data', (chunk: Buffer) => {
-      const lines = splitLines(chunk.toString());
-      lines.forEach((line) => {
-        const chatChunk = parseChunk(line);
-        if (chatChunk) {
-          emitter.emit('chunk', buildXHeaders(response, chatChunk as ChatCompletionChunk)); // Отправка события с новым чанком
-        }
-      });
+      emitLines(lineBuffer.push(chunk.toString()));
     });
     response.data.on('end', () => {
+      emitLines(lineBuffer.flush());
       emitter.emit('end'); // Отправка события завершения
     });
     response.data.on('error', (error: any) => {
