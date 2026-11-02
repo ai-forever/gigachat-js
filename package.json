@@ -1,6 +1,6 @@
 {
   "name": "gigachat",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "The official TypeScript library for the GigaChat API",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
@@ -10,15 +10,16 @@
     "format": "prettier --write --cache --cache-strategy metadata . !dist",
     "lint": "./scripts/lint",
     "fix": "./scripts/format",
-    "build": "./scripts/build"
+    "build": "./scripts/build",
+    "test": "npm run build && node --test tests/*.test.js"
   },
   "private": false,
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.13.5",
-    "uuid": "^11.0.3"
+    "axios": "^1.20.0",
+    "uuid": "^13.0.1"
   },
   "imports": {
     "gigachat": ".",

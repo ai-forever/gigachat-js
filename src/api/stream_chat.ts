@@ -38,7 +38,8 @@ function getRequestConfig(
 }
 
 function checkContentType(response: AxiosResponse): void {
-  const contentType = response.headers['content-type']?.split(';')[0];
+  const header = response.headers['content-type'];
+  const contentType = typeof header === 'string' ? header.split(';')[0] : undefined;
   if (contentType !== EVENT_STREAM) {
     throw new Error(`Expected response Content-Type to be '${EVENT_STREAM}', got '${contentType}'`);
   }
@@ -171,10 +172,12 @@ export async function stream_chat_readable(
       return reader.read().then(pump);
     });
   } else {
+    const decoder = new TextDecoder();
     response.data.on('data', (chunk: Buffer) => {
-      emitLines(lineBuffer.push(chunk.toString()));
+      emitLines(lineBuffer.push(decoder.decode(chunk, { stream: true })));
     });
     response.data.on('end', () => {
+      emitLines(lineBuffer.push(decoder.decode()));
       emitLines(lineBuffer.flush());
       emitter.emit('end'); // Отправка события завершения
     });
